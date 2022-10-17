@@ -1,3 +1,6 @@
 src/processing/.ipynb_checkpoints/
 src/processing/__pycache__/
 src/processing/config.py
+src/outputs/
+src/polyglot/config.yml
+src/polyglot/outputs/
