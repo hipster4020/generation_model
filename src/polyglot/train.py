@@ -1,23 +1,21 @@
 import hydra
-from transformers import AutoTokenizer, AutoModelForCausalLM
+import wandb
 
-@hydra.main(config_name='config.yml')
+from transformers import AutoTokenizer
+from dataloader import load
+
+@hydra.main(config_name="config.yml")
 def main(cfg):
+    # wandb init
+    # wandb.init(project=cfg.TRAINING.project_name)
+
     # tokenizer
     tokenizer = AutoTokenizer.from_pretrained(cfg.MODEL.model_name)
 
-    test_sentence = "안녕하세요. 테스트입니다."
-    input_ids = tokenizer(test_sentence, return_tensors="pt").input_ids
-
-
-    print(f"input_ids : {input_ids}")
-
-    # model
-    model = AutoModelForCausalLM.from_pretrained(cfg.MODEL.model_name)
-    print(model(input_ids))
-
-
-
+    # dataloader
+    train_dataset, eval_dataset = load(tokenizer=tokenizer, **cfg.DATASETS)
+    print(f"train_dataset : {train_dataset}")
+    print(f"eval_dataset : {eval_dataset}")
 
 if __name__ == "__main__":
     main()
