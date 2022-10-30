@@ -49,6 +49,13 @@ def load(
 
     return data["train"], (data["test"] if is_eval else None)
 
+
+def custom_data_collator(batch):
+    batch = default_data_collator(batch)
+    print(f"batch : {batch}")
+    return batch
+
 # Write preprocessor code to run in batches.
 def get_dataloader(dataset, **kwargs):
-    return DataLoader(dataset, collate_fn=default_data_collator, **kwargs)
+    custom_data_collator(dataset)
+    return DataLoader(dataset, collate_fn=custom_data_collator, **kwargs)

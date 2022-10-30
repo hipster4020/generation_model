@@ -6,7 +6,8 @@ def main(cfg):
     # tokenizer
     tokenizer = AutoTokenizer.from_pretrained(cfg.MODEL.model_name)
 
-    test_sentence = "안녕하세요. 저는 기타를 잘 칩니다."
+    test_sentence = "안녕하세요. 저는 기타를 잘 칩니다." + tokenizer.eos_token + tokenizer.bos_token
+    print(test_sentence)
     input_ids = tokenizer(test_sentence, return_tensors="pt").input_ids
 
     # model
