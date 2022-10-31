@@ -19,7 +19,7 @@ def load(
     shuffle_seed: Optional[int] = None,
 ):
     def _grouping(data):
-        
+        print(data)
         return data
 
     train_data_path = abspath(train_data_path)
