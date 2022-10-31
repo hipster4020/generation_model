@@ -10,6 +10,7 @@ logging.set_verbosity(logging.ERROR)
 
 
 def load(
+    tokenizer,
     train_data_path: str,
     eval_data_path: Optional[str] = None,
     train_test_split: Optional[float] = None,
@@ -17,6 +18,10 @@ def load(
     batch_size: int = 1000,
     shuffle_seed: Optional[int] = None,
 ):
+    def _grouping(data):
+        
+        return data
+
     train_data_path = abspath(train_data_path)
     is_eval = False
     _, extention = splitext(train_data_path)
@@ -44,18 +49,16 @@ def load(
     data = load_dataset(
         extention.replace(".", ""), data_files=datafiles, split=train_test_split
     )
+
+    data = data.map(
+        _grouping,
+        batched=True,
+        batch_size=batch_size,
+        num_proc=worker,
+        remove_columns=data["train"].column_names,
+    )
+
     if shuffle_seed is not None:
         data = data.shuffle(seed=shuffle_seed)
 
     return data["train"], (data["test"] if is_eval else None)
-
-
-def custom_data_collator(batch):
-    batch = default_data_collator(batch)
-    print(f"batch : {batch}")
-    return batch
-
-# Write preprocessor code to run in batches.
-def get_dataloader(dataset, **kwargs):
-    custom_data_collator(dataset)
-    return DataLoader(dataset, collate_fn=custom_data_collator, **kwargs)

@@ -6,3 +6,4 @@ src/polyglot/config.yml
 src/polyglot/outputs/
 src/polyglot/.ipynb_checkpoints/
 src/polyglot/__pycache__/
+src/polyglot/recommand/
