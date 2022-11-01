@@ -17,10 +17,10 @@ def main(cfg):
     # wandb.init(project=cfg.TRAINING.project_name)
 
     # tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(cfg.model.model_name)
+    tokenizer = AutoTokenizer.from_pretrained(cfg.PATH.tokenizer)
 
     # dataloader
-    train_dataset, eval_dataset = load(tokenizer, **cfg.DATASETS)
+    # train_dataset, eval_dataset = load(tokenizer, **cfg.DATASETS)
 
 if __name__ == "__main__":
     main()
