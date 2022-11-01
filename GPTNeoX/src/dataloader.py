@@ -11,6 +11,7 @@ logging.set_verbosity(logging.ERROR)
 
 def load(
     tokenizer,
+    seq_len: int,
     train_data_path: str,
     eval_data_path: Optional[str] = None,
     train_test_split: Optional[float] = None,
@@ -19,7 +20,15 @@ def load(
     shuffle_seed: Optional[int] = None,
 ):
     def _grouping(data):
-        print(data)
+        encoded = tokenizer.batch_encode_plus(
+            [tokenizer.bos_token + c + tokenizer.eos_token for c in data['content']],
+            max_length=seq_len,
+            truncation=True,
+            return_attention_mask=False,
+        )["input_ids"]
+
+        print(f"encoded : {encoded}")
+
         return data
 
     train_data_path = abspath(train_data_path)
