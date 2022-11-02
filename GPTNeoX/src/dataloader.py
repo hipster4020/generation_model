@@ -1,8 +1,9 @@
 from os.path import abspath, splitext
-from typing import Optional
+from typing import List, Optional, Union
 
 from datasets import load_dataset, logging
 import torch
+import numpy as np
 from torch.utils.data import DataLoader
 from transformers import default_data_collator
 
@@ -12,7 +13,7 @@ logging.set_verbosity(logging.ERROR)
 def load(
     tokenizer,
     seq_len: int,
-    train_data_path: str,
+    train_data_path: Union[str, List[str]],
     eval_data_path: Optional[str] = None,
     train_test_split: Optional[float] = None,
     worker: int = 1,
@@ -27,9 +28,28 @@ def load(
             return_attention_mask=False,
         )["input_ids"]
 
-        print(f"encoded : {encoded}")
+        input_ids = []
+        last_input_ids = []
+        last_room_no = data["room_no"][0]
+        
+        for ii, wr, ti in zip(encoded, data["speaker"], data["room_no"]):
+            if len(last_input_ids + ii) <= seq_len + 1 and last_room_no == ti:
+                last_input_ids += ii
+            else:
+                input_ids.append(last_input_ids)
+                las_input_ids = ii
+                last_room_no = ti
+        data = {"input_ids" : input_ids}
 
         return data
+
+    def _keymapping(data):
+        input_ids = np.full((len(data["input_ids"]), seq_len), tokenizer.pad_token_id)
+        
+
+        return {
+            
+        }
 
     train_data_path = abspath(train_data_path)
     is_eval = False
@@ -65,6 +85,13 @@ def load(
         batch_size=batch_size,
         num_proc=worker,
         remove_columns=data["train"].column_names,
+    )
+
+    data = data.map(
+        _keymapping,
+        batched=True,
+        batch_size=batch_size,
+        num_proc=worker,
     )
 
     if shuffle_seed is not None:

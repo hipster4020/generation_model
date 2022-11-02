@@ -20,7 +20,7 @@ def main(cfg):
     tokenizer = AutoTokenizer.from_pretrained(cfg.PATH.tokenizer)
 
     # dataloader
-    # train_dataset, eval_dataset = load(tokenizer, **cfg.DATASETS)
+    train_dataset, eval_dataset = load(tokenizer, **cfg.DATASETS)
 
 if __name__ == "__main__":
     main()
