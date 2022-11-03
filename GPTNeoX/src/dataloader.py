@@ -37,7 +37,7 @@ def load(
                 last_input_ids += ii
             else:
                 input_ids.append(last_input_ids)
-                las_input_ids = ii
+                last_input_ids = ii
                 last_room_no = ti
         data = {"input_ids" : input_ids}
 
@@ -45,10 +45,18 @@ def load(
 
     def _keymapping(data):
         input_ids = np.full((len(data["input_ids"]), seq_len), tokenizer.pad_token_id)
-        
+        attention_mask = np.zeros((len(data["input_ids"]), seq_len))
+        labels = np.full((len(data["input_ids"]), seq_len), tokenizer.pad_token_id)
 
+        for i, ids in enumerate(data["input_ids"]):
+            input_ids[i, : len(ids) - 1] = ids[:-1]
+            attention_mask[i, : len(ids) - 1] = np.ones((len(ids) - 1,))
+            labels[i, : len(ids) - 1] = ids[1:]
+        
         return {
-            
+            "input_ids": input_ids,
+            "attention_mask": attention_mask,
+            "labels": labels,
         }
 
     train_data_path = abspath(train_data_path)
@@ -56,7 +64,6 @@ def load(
     _, extention = splitext(train_data_path)
 
     datafiles = {"train": train_data_path}
-
     if eval_data_path is not None:
         assert (
             train_test_split is None
@@ -76,7 +83,9 @@ def load(
         is_eval = True
 
     data = load_dataset(
-        extention.replace(".", ""), data_files=datafiles, split=train_test_split
+        extention.replace(".", ""),
+        data_files=datafiles,
+        split=train_test_split,
     )
 
     data = data.map(
