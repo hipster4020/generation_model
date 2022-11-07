@@ -15,20 +15,17 @@ from dataloader import load
 @hydra.main(config_name="config.yml")
 def main(cfg):
     # wandb init
-    # wandb.init(project=cfg.TRAINING.project_name)
+    wandb.init(
+        project=cfg.ETC.project, entity=cfg.ETC.entity, name=cfg.ETC.name,
+    )
 
     # tokenizer
     tokenizer = AutoTokenizer.from_pretrained(cfg.PATH.tokenizer)
 
     # dataloader
     train_dataset, eval_dataset = load(tokenizer, **cfg.DATASETS)
-    print(f"train_dataset : {train_dataset}")
 
     # model
-    print(f"vocab_size : {tokenizer.vocab_size}")
-    print(f"bos_token_id : {tokenizer.bos_token_id}")
-    print(f"eos_token_id : {tokenizer.eos_token_id}")
-
     model = GPTNeoXForCausalLM(
         GPTNeoXConfig(
             vocab_size=tokenizer.vocab_size,
@@ -37,7 +34,6 @@ def main(cfg):
             **cfg.MODEL,
         )
     )
-    print(f"model : {model}")
 
     # wandb
     if cfg.ETC.get("wandb_project"):
@@ -63,7 +59,7 @@ def main(cfg):
     # train
     trainer.train()
 
-    # 
+    # model save
     trainer.save_model(cfg.PATH.output_dir)
 
     if cfg.ETC.get("wandb_project"):
