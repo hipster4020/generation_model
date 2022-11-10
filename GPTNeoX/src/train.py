@@ -41,37 +41,36 @@ def main(cfg):
             **cfg.MODEL,
         )
     )
-    print(model.get_config_dict())
 
     # wandb
     if cfg.ETC.get("wandb_project"):
         os.environ["WANDB_PROJECT"] = cfg.ETC.wandb_project
 
-    # # trainingargs setting
-    # args = TrainingArguments(
-    #     do_train=True,
-    #     do_eval=eval_dataset is not None,
-    #     logging_dir=cfg.PATH.logging_dir,
-    #     output_dir=cfg.PATH.checkpoint_dir,
-    #     **cfg.TRAININGARGS,
-    # )
-    # trainer = Trainer(
-    #     model=model,
-    #     args=args,
-    #     train_dataset=train_dataset,
-    #     eval_dataset=eval_dataset,
-    #     tokenizer=None,
-    #     data_collator=default_data_collator,
-    # )
+    # trainingargs setting
+    args = TrainingArguments(
+        do_train=True,
+        do_eval=eval_dataset is not None,
+        logging_dir=cfg.PATH.logging_dir,
+        output_dir=cfg.PATH.checkpoint_dir,
+        **cfg.TRAININGARGS,
+    )
+    trainer = Trainer(
+        model=model,
+        args=args,
+        train_dataset=train_dataset,
+        eval_dataset=eval_dataset,
+        tokenizer=None,
+        data_collator=default_data_collator,
+    )
 
-    # # train
-    # trainer.train()
+    # train
+    trainer.train()
 
-    # # model save
-    # trainer.save_model(cfg.PATH.output_dir)
+    # model save
+    trainer.save_model(cfg.PATH.output_dir)
 
-    # if cfg.ETC.get("wandb_project"):
-    #     wandb.finish()
+    if cfg.ETC.get("wandb_project"):
+        wandb.finish()
 
 if __name__ == "__main__":
     main()
